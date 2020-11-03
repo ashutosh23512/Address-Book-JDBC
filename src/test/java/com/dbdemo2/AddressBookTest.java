@@ -1,5 +1,8 @@
 package com.dbdemo2;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +16,7 @@ public class AddressBookTest {
 	public void givenEmpPayrollDataInDB_ShouldMatchEmpCount() {
 		AddressBookService service = new AddressBookService();
 		List<AddressBookData> addList = service.readAddressBookData(IOService.DB_IO);
-		Assert.assertEquals(5, addList.size());
+		Assert.assertEquals(8, addList.size());
 	}
 
 	@Test
@@ -49,4 +52,22 @@ public class AddressBookTest {
 		boolean result = service.checkAddressBookDataInSyncWithDB("zzz", "temp");
 		Assert.assertTrue(result);
 	}
+	
+	@Test 
+    public void given3Contacts_WhenAdded_ShouldMatchContactsCount() {
+    	AddressBookData[] addBookData = {
+    			new AddressBookData(11,"qq", "ww", "ee","rr", "tt", "12345", "988888888", "abc@gmail.com"),
+    			new AddressBookData(12,"aa", "ss", "dd","ff", "gg", "12345", "9000000000", "abc@gmail.com"),
+    			new AddressBookData(13,"zz", "xx", "cc","vv", "bb", "12345", "9111111111", "abc@gmail.com"),
+    	};
+    	AddressBookService addBookService = new AddressBookService();
+    	addBookService.readAddressBookData(IOService.DB_IO);
+    	Instant threadStart = Instant.now();
+    	addBookService.addContactsWithThreads(Arrays.asList(addBookData));
+    	Instant threadEnd = Instant.now();
+    	System.out.println("Duration with thread : " + Duration.between(threadStart, threadEnd));
+    	List<AddressBookData> addressBookData = addBookService.readAddressBookData(IOService.DB_IO);
+    	System.out.println(addressBookData.size());
+    	Assert.assertEquals(8, addressBookData.size());
+    }
 }

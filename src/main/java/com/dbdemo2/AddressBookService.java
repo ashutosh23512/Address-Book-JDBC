@@ -1,8 +1,8 @@
 package com.dbdemo2;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class AddressBookService {
 	public enum IOService {
@@ -11,6 +11,7 @@ public class AddressBookService {
 
 	private static List<AddressBookData> addList;
 	private AddressBookDBService addressBookDBService;
+	AddressBookData ad = null;
 
 	public AddressBookService() {
 		addressBookDBService = AddressBookDBService.getInstance();
@@ -55,23 +56,47 @@ public class AddressBookService {
 		}
 		return false;
 	}
-	
+
 	public Map<String, Integer> readCountContactsByCity(IOService ioService) {
-		if(ioService.equals(IOService.DB_IO)) {
+		if (ioService.equals(IOService.DB_IO)) {
 			return addressBookDBService.getCountByCity();
 		}
 		return null;
 	}
 
 	public Map<String, Integer> readCountContactsByState(IOService ioService) {
-		if(ioService.equals(IOService.DB_IO)) {
+		if (ioService.equals(IOService.DB_IO)) {
 			return addressBookDBService.getCountByState();
 		}
 		return null;
 	}
-	
-	public void addContact(int id,String firstName, String lastName, String  address, String city, String state, String zipcode, String phone, String email) {
-		addList.add(addressBookDBService.addContact(id,firstName, lastName, address, city, state, zipcode, phone, email));
+
+	public void addContact(int id, String firstName, String lastName, String address, String city, String state,
+			String zipcode, String phone, String email) {
+		addList.add(
+				addressBookDBService.addContact(id, firstName, lastName, address, city, state, zipcode, phone, email));
+	}
+
+	public void addContactsWithThreads(List<AddressBookData> addBookList) {
+		Map<Integer, Boolean> contactAdditionStatus = new HashMap<Integer, Boolean>();
+		addBookList.forEach(ad -> {
+			Runnable task = () -> {
+				contactAdditionStatus.put(addressBookDBService.hashCode(), false);
+
+				this.addContact(ad.id, ad.first_name, ad.last_name, ad.address, ad.city, ad.state, ad.zip, ad.phone_no,
+						ad.email);
+				contactAdditionStatus.put(addressBookDBService.hashCode(), true);
+
+			};
+			Thread thread = new Thread(task, ad.first_name);
+			thread.start();
+		});
+		while (contactAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 }
