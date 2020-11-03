@@ -1,6 +1,7 @@
 package com.dbdemo2;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,5 +23,21 @@ public class AddressBookTest {
     	service.updateContactsCity("abc", "delhi");
     	boolean result = service.checkAddressBookDataInSyncWithDB("abc","delhi");
 		Assert.assertTrue(result);
+    }
+	
+	@Test
+    public void givenContactsData_WhenCountByCity_ShouldReturnProperValue() {
+    	AddressBookService service = new AddressBookService();
+    	service.readAddressBookData(IOService.DB_IO);
+    	Map<String, Integer> countContactsByCity = service.readCountContactsByCity(IOService.DB_IO);
+    	Assert.assertTrue(countContactsByCity.get("amritsar").equals(1));
+    }
+	
+	@Test
+    public void givenContactsData_WhenCountByState_ShouldReturnProperValue() {
+    	AddressBookService service = new AddressBookService();
+    	service.readAddressBookData(IOService.DB_IO);
+    	Map<String, Integer> countContactsByState = service.readCountContactsByState(IOService.DB_IO);
+    	Assert.assertTrue(countContactsByState.get("punjab").equals(4));
     }
 }
