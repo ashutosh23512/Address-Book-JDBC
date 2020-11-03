@@ -115,4 +115,22 @@ public class AddressBookDBService {
 		}
 		return stateToContactsMap;
 	}
+	
+	public AddressBookData addContact(int id,String firstName, String lastName, String address, String city, String state, String zipcode, String phone, String email) {
+		AddressBookData addBookData = null;
+		String sql = String.format("INSERT INTO address_book_service (id,firstname, lastname, address, city, state, zip, phonenumber, email) VALUES (%s,'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", id,firstName, lastName, address, city, state, zipcode, phone, email);
+		try(Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if(rowAffected == 1) {
+				ResultSet result = statement.getGeneratedKeys();
+				if(result.next())	firstName = result.getString("firstname");
+			}
+			addBookData = new AddressBookData(id,firstName, lastName, address, city, state, zipcode, phone, email);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return addBookData;
+	}
 }
