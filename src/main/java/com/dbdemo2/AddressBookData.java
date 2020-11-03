@@ -24,4 +24,9 @@ public class AddressBookData {
 		this.email = email;
 	}
 
+	@Override
+	public String toString() {
+		return "id: " + id + "first name: " + first_name + "last name: " + last_name;
+	}
+
 }
