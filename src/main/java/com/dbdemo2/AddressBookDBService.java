@@ -2,6 +2,7 @@ package com.dbdemo2;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -60,5 +61,20 @@ public class AddressBookDBService {
 			e.printStackTrace();
 		}
 		return addressBookList;
+	}
+
+	public int updateAddressBookDataUsingPreparedStatement(String fname, String city) {
+		return this.updateAddressBookDataUsingPreparedStatementt(fname, city);
+	}
+
+	private int updateAddressBookDataUsingPreparedStatementt(String fname, String city) {
+		String sql = String.format("update address_book_service set city= '%s' where firstname = '%s';", city, fname);
+		try (Connection connection = this.getConnection()) {
+			PreparedStatement stmt = connection.prepareStatement(sql);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }
