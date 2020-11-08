@@ -33,7 +33,7 @@ public class AddressBookService {
 		return this.addList;
 	}
 
-	private AddressBookData getAddressBookData(String name) {
+	AddressBookData getAddressBookData(String name) {
 		for (AddressBookData data : addList) {
 			if (data.first_name.equals(name)) {
 				return data;
@@ -103,10 +103,15 @@ public class AddressBookService {
 			}
 		}
 	}
-	
-public void addPerson(AddressBookData personData, IOService ioService) {
-		
+
+	public void addPerson(AddressBookData personData, IOService ioService) {
+
 		addList.add(personData);
+	}
+	public void updatePersonCity(String name, String city, IOService ioService) {
+		AddressBookData personData = this.getAddressBookData(name);
+		if (personData != null)
+			personData.city = city;
 	}
 
 }
