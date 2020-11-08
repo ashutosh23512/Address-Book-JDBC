@@ -1,12 +1,13 @@
 package com.dbdemo2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AddressBookService {
 	public enum IOService {
-		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
+		DB_IO, REST_IO
 	}
 
 	private static List<AddressBookData> addList;
@@ -17,8 +18,12 @@ public class AddressBookService {
 		addressBookDBService = AddressBookDBService.getInstance();
 	}
 
+	public static long countEntries() {
+		return addList.size();
+	}
+
 	public AddressBookService(List<AddressBookData> empList) {
-		this.addList = addList;
+		this.addList = new ArrayList<>(addList);
 	}
 
 	public List<AddressBookData> readAddressBookData(IOService dbIo) {
@@ -97,6 +102,11 @@ public class AddressBookService {
 			} catch (InterruptedException e) {
 			}
 		}
+	}
+	
+public void addPerson(AddressBookData personData, IOService ioService) {
+		
+		addList.add(personData);
 	}
 
 }
