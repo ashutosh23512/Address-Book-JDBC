@@ -127,4 +127,20 @@ public class AddressBookTest {
 		request.body(empJson);
 		return request.post("/addbook");
 	}
+	
+	@Test
+	public void givenNewCityForPerson_WhenUpdated_ShouldMatch200ResponseAndCount() {
+		AddressBookService service;
+		AddressBookData[] ArrayOfEmps = getaddbook();
+		service = new AddressBookService(Arrays.asList(ArrayOfEmps));
+		service.updatePersonCity("mno", "newCity1", IOService.REST_IO);
+		AddressBookData personData = service.getAddressBookData("mno");
+		String personJson = new Gson().toJson(personData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(personJson);
+		Response response = request.put("/persons/" + personData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
+	}
 }
