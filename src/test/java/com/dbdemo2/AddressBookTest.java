@@ -7,9 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.dbdemo2.AddressBookService.IOService;
+import com.google.gson.Gson;
+
+import io.restassured.*;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public class AddressBookTest {
 	@Test
@@ -53,6 +59,8 @@ public class AddressBookTest {
 		Assert.assertTrue(result);
 	}
 	
+	
+	
 	@Test 
     public void given3Contacts_WhenAdded_ShouldMatchContactsCount() {
     	AddressBookData[] addBookData = {
@@ -70,4 +78,53 @@ public class AddressBookTest {
     	System.out.println(addressBookData.size());
     	Assert.assertEquals(8, addressBookData.size());
     }
+
+	@Before
+	public void Setup() {
+		RestAssured.baseURI = "http://localhost";
+		RestAssured.port = 3000;
+	}
+
+	@Test
+	public void givenEmployeeInJSONServer_whenRetrieved_ShouldMatchTheCount() {
+		AddressBookData[] arrayOfcontacts = getaddbook();
+		AddressBookService addressBookService = new AddressBookService(Arrays.asList(arrayOfcontacts));
+		long entries = AddressBookService.countEntries();
+		Assert.assertEquals(8, entries);
+	}
+
+	private AddressBookData[] getaddbook() {
+		Response response = RestAssured.get("/addbook");
+		System.out.println("Address Book Contacts IN JSONServer:\n" + response.asString());
+		AddressBookData[] arrayOfcontacts = new Gson().fromJson(response.asString(), AddressBookData[].class);
+		return arrayOfcontacts;
+	}
+	@Test
+	public void givenNewPersons_WhenAdded_ShouldMatch201ResponseAndCount() {
+		AddressBookService service;
+		AddressBookData[] ArrayOfEmps = getaddbook();
+		service = new AddressBookService(Arrays.asList(ArrayOfEmps));
+		AddressBookData[] arrayPersonData = {
+				new AddressBookData(4, "stu", "vwx", "125 Street", "city4", "state4", "19013121", "9999999996",
+						"stu@gmail.com"),
+				new AddressBookData(5, "yzq", "abc", "123 Street", "city5", "state5", "1310021", "9999999994",
+						"yzq@gmail.com") };
+		for (AddressBookData personData : Arrays.asList(arrayPersonData)) {
+			Response response = addPersonToJsonServer(personData);
+			int statusCode = response.getStatusCode();
+			Assert.assertEquals(201, statusCode);
+			personData = new Gson().fromJson(response.asString(), AddressBookData.class);
+			service.addPerson(personData, IOService.REST_IO);
+		}
+		long entries = service.countEntries();
+		Assert.assertEquals(10, entries);
+	}
+	
+	private Response addPersonToJsonServer(AddressBookData employeePayrollData) {
+		String empJson = new Gson().toJson(employeePayrollData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(empJson);
+		return request.post("/addbook");
+	}
 }
