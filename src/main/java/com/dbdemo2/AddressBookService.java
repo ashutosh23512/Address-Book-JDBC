@@ -22,8 +22,9 @@ public class AddressBookService {
 		return addList.size();
 	}
 
-	public AddressBookService(List<AddressBookData> empList) {
+	public AddressBookService(List<AddressBookData> addList) {
 		this.addList = new ArrayList<>(addList);
+		
 	}
 
 	public List<AddressBookData> readAddressBookData(IOService dbIo) {
@@ -34,8 +35,9 @@ public class AddressBookService {
 	}
 
 	AddressBookData getAddressBookData(String name) {
+		System.out.println("xxxx"+addList);
 		for (AddressBookData data : addList) {
-			if (data.first_name.equals(name)) {
+			if (data.first_name.equalsIgnoreCase(name)) {
 				return data;
 			}
 		}
@@ -108,10 +110,19 @@ public class AddressBookService {
 
 		addList.add(personData);
 	}
+	
 	public void updatePersonCity(String name, String city, IOService ioService) {
 		AddressBookData personData = this.getAddressBookData(name);
 		if (personData != null)
 			personData.city = city;
+		System.out.println("xxxxxxxx"+personData);
+	}
+	
+	public void deletePersonData(String name, IOService ioService) {
+		if (ioService.equals(IOService.REST_IO)) {
+			AddressBookData personData = this.getAddressBookData(name);
+			addList.remove(personData);
+		}
 	}
 
 }

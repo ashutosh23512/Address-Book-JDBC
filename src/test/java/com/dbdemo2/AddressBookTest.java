@@ -133,14 +133,31 @@ public class AddressBookTest {
 		AddressBookService service;
 		AddressBookData[] ArrayOfEmps = getaddbook();
 		service = new AddressBookService(Arrays.asList(ArrayOfEmps));
-		service.updatePersonCity("mno", "newCity1", IOService.REST_IO);
-		AddressBookData personData = service.getAddressBookData("mno");
+		service.updatePersonCity("stu", "newCity1", IOService.REST_IO);
+		AddressBookData personData = service.getAddressBookData("stu");
 		String personJson = new Gson().toJson(personData);
 		RequestSpecification request = RestAssured.given();
 		request.header("Content-Type", "application/json");
 		request.body(personJson);
-		Response response = request.put("/persons/" + personData.id);
+		Response response = request.put("/addbook/" + personData.id);
 		int statusCode = response.getStatusCode();
 		Assert.assertEquals(200, statusCode);
+	}
+	
+	@Test
+	public void givenEmployeeName_WhenDeleted_ShouldMatch200ResponseAndCount() {
+		AddressBookService service;
+		AddressBookData[] ArrayOfEmps = getaddbook();
+		service = new AddressBookService(Arrays.asList(ArrayOfEmps));
+		AddressBookData personData = service.getAddressBookData("stu");
+		String personJson = new Gson().toJson(personData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		Response response = request.delete("/addbook/" + personData.id);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(200, statusCode);
+		service.deletePersonData(personData.first_name, IOService.REST_IO);
+		long entries = service.countEntries();
+		Assert.assertEquals(3, entries);
 	}
 }
